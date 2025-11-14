@@ -1,0 +1,420 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Xadrez - A Arte da Estratégia</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        :root {
+            --dark: #1a1a2e;
+            --medium: #16213e;
+            --light: #0f3460;
+            --accent: #e94560;
+            --text: #f1f1f1;
+            --chess-white: #eeeed2;
+            --chess-black: #769656;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            line-height: 1.6;
+            color: var(--text);
+            background: linear-gradient(135deg, var(--dark) 0%, var(--medium) 50%, var(--light) 100%);
+            min-height: 100vh;
+            overflow-x: hidden;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+
+        /* Header com efeito de tabuleiro */
+        header {
+            text-align: center;
+            padding: 80px 20px;
+            margin-bottom: 40px;
+            position: relative;
+            overflow: hidden;
+            border-radius: 10px;
+            background: 
+                radial-gradient(circle at 20% 80%, rgba(233, 69, 96, 0.1) 0%, transparent 50%),
+                radial-gradient(circle at 80% 20%, rgba(22, 33, 62, 0.3) 0%, transparent 50%),
+                linear-gradient(135deg, var(--medium) 0%, var(--light) 100%);
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5);
+        }
+
+        .chess-board-bg {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            opacity: 0.1;
+            background-image: 
+                linear-gradient(45deg, var(--chess-white) 25%, transparent 25%), 
+                linear-gradient(-45deg, var(--chess-white) 25%, transparent 25%), 
+                linear-gradient(45deg, transparent 75%, var(--chess-white) 75%), 
+                linear-gradient(-45deg, transparent 75%, var(--chess-white) 75%);
+            background-size: 40px 40px;
+            background-position: 0 0, 0 20px, 20px -20px, -20px 0px;
+        }
+
+        h1 {
+            font-size: 4rem;
+            margin-bottom: 20px;
+            text-transform: uppercase;
+            letter-spacing: 4px;
+            font-weight: 800;
+            text-shadow: 3px 3px 5px rgba(0, 0, 0, 0.5);
+            position: relative;
+            z-index: 2;
+            background: linear-gradient(to right, #fff 0%, var(--accent) 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        .subtitle {
+            font-size: 1.5rem;
+            margin-bottom: 30px;
+            opacity: 0.9;
+            position: relative;
+            z-index: 2;
+            max-width: 600px;
+            margin-left: auto;
+            margin-right: auto;
+        }
+
+        /* Seção de introdução */
+        .intro-section {
+            display: flex;
+            align-items: center;
+            gap: 40px;
+            margin-bottom: 60px;
+            background: rgba(255, 255, 255, 0.05);
+            padding: 40px;
+            border-radius: 10px;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
+            backdrop-filter: blur(10px);
+        }
+
+        .intro-text {
+            flex: 1;
+        }
+
+        .intro-text h2 {
+            font-size: 2.2rem;
+            margin-bottom: 20px;
+            color: var(--accent);
+        }
+
+        .chess-piece {
+            flex: 0 0 200px;
+            text-align: center;
+            font-size: 120px;
+            color: var(--chess-white);
+            filter: drop-shadow(0 5px 15px rgba(0, 0, 0, 0.3));
+            animation: float 3s ease-in-out infinite;
+        }
+
+        /* Grid de benefícios */
+        .benefits-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 30px;
+            margin-bottom: 60px;
+        }
+
+        .benefit-card {
+            background: rgba(255, 255, 255, 0.08);
+            padding: 30px;
+            border-radius: 10px;
+            box-shadow: 0 5px 20px rgba(0, 0, 0, 0.2);
+            transition: all 0.3s ease;
+            backdrop-filter: blur(5px);
+            border-top: 3px solid var(--accent);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .benefit-card::before {
+            content: "";
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(135deg, transparent 0%, rgba(233, 69, 96, 0.1) 100%);
+            opacity: 0;
+            transition: opacity 0.3s ease;
+        }
+
+        .benefit-card:hover {
+            transform: translateY(-10px);
+            box-shadow: 0 15px 30px rgba(0, 0, 0, 0.4);
+        }
+
+        .benefit-card:hover::before {
+            opacity: 1;
+        }
+
+        .benefit-icon {
+            font-size: 2.5rem;
+            margin-bottom: 20px;
+            color: var(--accent);
+        }
+
+        .benefit-card h3 {
+            color: var(--text);
+            margin-bottom: 15px;
+            font-size: 1.4rem;
+            position: relative;
+            z-index: 2;
+        }
+
+        .benefit-card p {
+            color: rgba(255, 255, 255, 0.8);
+            font-size: 1rem;
+            line-height: 1.6;
+            position: relative;
+            z-index: 2;
+        }
+
+        /* Seção CTA */
+        .cta-section {
+            text-align: center;
+            background: rgba(255, 255, 255, 0.05);
+            padding: 60px 30px;
+            border-radius: 10px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
+            margin-bottom: 40px;
+            backdrop-filter: blur(5px);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .cta-section::before {
+            content: "";
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: 
+                radial-gradient(circle at 30% 70%, rgba(233, 69, 96, 0.1) 0%, transparent 50%),
+                radial-gradient(circle at 70% 30%, rgba(22, 33, 62, 0.3) 0%, transparent 50%);
+        }
+
+        .cta-section h2 {
+            font-size: 2.5rem;
+            margin-bottom: 20px;
+            position: relative;
+            z-index: 2;
+        }
+
+        .cta-section p {
+            max-width: 600px;
+            margin: 0 auto 30px;
+            font-size: 1.1rem;
+            opacity: 0.9;
+            position: relative;
+            z-index: 2;
+        }
+
+        .cta-button {
+            display: inline-block;
+            background: var(--accent);
+            color: white;
+            padding: 15px 40px;
+            text-decoration: none;
+            border-radius: 5px;
+            font-size: 1.2rem;
+            font-weight: bold;
+            transition: all 0.3s ease;
+            margin-top: 20px;
+            position: relative;
+            z-index: 2;
+            box-shadow: 0 5px 15px rgba(233, 69, 96, 0.4);
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+
+        .cta-button:hover {
+            background: #ff2e4f;
+            transform: translateY(-3px);
+            box-shadow: 0 8px 20px rgba(233, 69, 96, 0.6);
+        }
+
+        /* Próxima página */
+        .next-page {
+            text-align: center;
+            margin-top: 40px;
+            padding: 20px;
+            color: rgba(255, 255, 255, 0.7);
+            font-size: 1.2rem;
+            transition: all 0.3s ease;
+            cursor: pointer;
+        }
+
+        .next-page:hover {
+            color: white;
+            transform: translateY(-5px);
+        }
+
+        /* Animações */
+        @keyframes float {
+            0% { transform: translateY(0px); }
+            50% { transform: translateY(-10px); }
+            100% { transform: translateY(0px); }
+        }
+
+        .benefit-card:nth-child(1) { animation-delay: 0.1s; }
+        .benefit-card:nth-child(2) { animation-delay: 0.2s; }
+        .benefit-card:nth-child(3) { animation-delay: 0.3s; }
+        .benefit-card:nth-child(4) { animation-delay: 0.4s; }
+
+        /* Responsividade */
+        @media (max-width: 768px) {
+            .intro-section {
+                flex-direction: column;
+                text-align: center;
+            }
+            
+            .chess-piece {
+                flex: 0 0 auto;
+                margin-top: 20px;
+            }
+            
+            h1 {
+                font-size: 2.8rem;
+            }
+            
+            .benefits-grid {
+                grid-template-columns: 1fr;
+            }
+            
+            .cta-section h2 {
+                font-size: 2rem;
+            }
+        }
+
+        @media (max-width: 480px) {
+            h1 {
+                font-size: 2.2rem;
+            }
+            
+            .subtitle {
+                font-size: 1.2rem;
+            }
+            
+            .intro-text h2 {
+                font-size: 1.8rem;
+            }
+            
+            .cta-button {
+                padding: 12px 30px;
+                font-size: 1.1rem;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <header>
+            <div class="chess-board-bg"></div>
+            <h1>XADREZ</h1>
+            <p class="subtitle">A arte da estratégia, onde cada movimento é um pensamento e cada partida, uma batalha de mentes.</p>
+        </header>
+
+        <section class="intro-section">
+            <div class="intro-text">
+                <h2>Mais que um jogo, uma jornada intelectual</h2>
+                <p>O xadrez transcende as barreiras do entretenimento para se tornar uma ferramenta poderosa de desenvolvimento cognitivo. Em um tabuleiro de 64 casas, você exercita não apenas a lógica, mas também a criatividade, a paciência e a capacidade de tomar decisões sob pressão.</p>
+            </div>
+            <div class="chess-piece">
+                <i class="fas fa-chess-queen"></i>
+            </div>
+        </section>
+
+        <section class="benefits-grid">
+            <div class="benefit-card">
+                <div class="benefit-icon">
+                    <i class="fas fa-brain"></i>
+                </div>
+                <h3>Raciocínio Lógico</h3>
+                <p>Desenvolva o pensamento estratégico e a capacidade de analisar múltiplas variáveis simultaneamente, antecipando consequências e planejando jogadas com precisão matemática.</p>
+            </div>
+
+            <div class="benefit-card">
+                <div class="benefit-icon">
+                    <i class="fas fa-chess-board"></i>
+                </div>
+                <h3>Visão Estratégica</h3>
+                <p>Aprenda a enxergar o quadro geral enquanto mantém atenção aos detalhes, desenvolvendo a capacidade de pensar a longo prazo e antecipar os movimentos do oponente.</p>
+            </div>
+
+            <div class="benefit-card">
+                <div class="benefit-icon">
+                    <i class="fas fa-hourglass-half"></i>
+                </div>
+                <h3>Paciência e Foco</h3>
+                <p>Domine a arte da paciência estratégica, aprendendo a esperar o momento certo para agir enquanto mantém concentração total durante longos períodos.</p>
+            </div>
+
+            <div class="benefit-card">
+                <div class="benefit-icon">
+                    <i class="fas fa-chess-knight"></i>
+                </div>
+                <h3>Criatividade Tática</h3>
+                <p>Estimule o pensamento criativo através da descoberta de combinações inesperadas e soluções engenhosas para problemas aparentemente insolúveis.</p>
+            </div>
+        </section>
+
+        <section class="cta-section">
+            <h2>Junte-se à Comunidade de Estrategistas</h2>
+            <p>Desperte o grande mestre de xadrez dentro de você. Comece sua jornada hoje e transforme sua maneira de pensar tanto dentro quanto fora do tabuleiro.</p>
+            <a href="#" class="cta-button">Comece Agora</a>
+        </section>
+
+        <div class="next-page">
+            <p>PRÓXIMA PÁGINA <i class="fas fa-chevron-down"></i></p>
+        </div>
+    </div>
+
+    <script>
+        // Adicionando interatividade simples
+        document.querySelector('.next-page').addEventListener('click', function() {
+            window.scrollTo({
+                top: document.body.scrollHeight,
+                behavior: 'smooth'
+            });
+        });
+
+        // Efeito de digitação no subtítulo
+        document.addEventListener('DOMContentLoaded', function() {
+            const subtitle = document.querySelector('.subtitle');
+            const text = subtitle.textContent;
+            subtitle.textContent = '';
+            
+            let i = 0;
+            const typeWriter = () => {
+                if (i < text.length) {
+                    subtitle.textContent += text.charAt(i);
+                    i++;
+                    setTimeout(typeWriter, 50);
+                }
+            };
+            
+            setTimeout(typeWriter, 1000);
+        });
+    </script>
+</body>
+</html>
